@@ -1,37 +1,22 @@
 pipeline {
     agent any
 
-    environment {
-        APP_NAME = 'mern-app'
-        NODE_VERSION = '16'  // Use your required Node version
-    }
-
+    // 🔥 Matches the name in "Global Tool Configuration"
     tools {
-        nodejs 'NodeJS'  // This refers to a NodeJS installation configured in Jenkins
+        nodejs 'NodeJS-16'  
     }
 
     stages {
-        stage('Checkout') {
+        stage('Check Node/NPM') {
             steps {
-                checkout scm
+                sh 'node --version && npm --version'  // Verify install
             }
         }
 
-        stage('Setup Node') {
-            steps {
-                script {
-                    // Verify Node/npm are available
-                    sh """
-                        node --version
-                        npm --version
-                    """
-                }
-            }
-        }
-
-        stage('Install Dependencies') {
+        stage('Install & Build') {
             steps {
                 sh 'npm install'
+                sh 'npm run build'  // If needed
             }
         }
 
@@ -39,15 +24,6 @@ pipeline {
             steps {
                 sh 'npm test'
             }
-        }
-    }
-
-    post {
-        always {
-            cleanWs()
-        }
-        failure {
-            echo 'Pipeline failed!'
         }
     }
 }
